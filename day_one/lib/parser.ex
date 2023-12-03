@@ -21,7 +21,7 @@ defmodule Parser do
 
     word_number_instances = word_instances ++ number_instances
 
-    highest_lowest_pair = find_first_and_last(number_instances, string)
+    highest_lowest_pair = find_first_and_last(word_number_instances, string)
     highest_lowest_pair |> Enum.map(&word_to_number/1)
   end
 
