@@ -1,3 +1,5 @@
+require IEx
+
 defmodule Parser do
   def input_one do
     {:ok, text} = File.read(~c"./input_one.txt")
@@ -18,10 +20,9 @@ defmodule Parser do
     number_instances = pull_digits(string)
 
     word_number_instances = word_instances ++ number_instances
-    word_number_instances |> Enum.map(&IO.puts/1)
 
-    reorder = find_first_and_last(word_number_instances, string)
-    IO.puts(reorder)
+    highest_lowest_pair = find_first_and_last(number_instances, string)
+    highest_lowest_pair |> Enum.map(&word_to_number/1)
   end
 
   def pull_words(string) do
@@ -38,33 +39,50 @@ defmodule Parser do
 
   # Rearrange based on where appear in string
   def find_first_and_last(list, string) do
-    new = []
+    new =
+      list
+      |> Enum.map(fn item ->
+        {index, _} = :binary.match(string, to_string(item))
+        [item, index]
+      end)
 
-    list
-    |> Enum.flat_map(fn item ->
-      {index, _} = :binary.match(string, to_string(item))
-      format = [item, index]
-      new = [format | new]
-    end)
-
-    new |> highest_and_lowest
+    new |> highest_and_lowest(["", 999_999_999], ["", -999_999_999])
   end
 
-  def highest_and_lowest(list) do
-    current_lowest = ["", 999_999]
-    current_highest = ["", -1]
-
-    list
-    |> Enum.map(fn pair ->
-      if Enum.at(pair, 1) < Enum.at(current_lowest, 1) do
-        current_lowest = pair
-      end
-
-      if Enum.at(pair, 1) > Enum.at(current_highest, 1) do
-        current_highest = pair
-      end
-    end)
-
+  def highest_and_lowest([], current_lowest, current_highest) do
     [Enum.at(current_lowest, 0), Enum.at(current_highest, 0)]
+  end
+
+  def highest_and_lowest([pair | rest], current_lowest, current_highest) do
+    new_lowest =
+      if Enum.at(pair, 1) < Enum.at(current_lowest, 1) do
+        [Enum.at(pair, 0), Enum.at(pair, 1)]
+      else
+        current_lowest
+      end
+
+    new_highest =
+      if Enum.at(pair, 1) > Enum.at(current_highest, 1) do
+        [Enum.at(pair, 0), Enum.at(pair, 1)]
+      else
+        current_highest
+      end
+
+    highest_and_lowest(rest, new_lowest, new_highest)
+  end
+
+  def word_to_number(word) do
+    case word do
+      "one" -> 1
+      "two" -> 2
+      "three" -> 3
+      "four" -> 4
+      "five" -> 5
+      "six" -> 6
+      "seven" -> 7
+      "eight" -> 8
+      "nine" -> 9
+      _ -> word
+    end
   end
 end
