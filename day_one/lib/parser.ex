@@ -14,46 +14,29 @@ defmodule Parser do
   # Put them together eg 3 and 2 is then 32
   # return 32 and sum in main
   def read_string(string) do
-    word_regex = ~r/(one|two|three|four|five|six|seven|eight|nine)/
-    number_regex = ~r/(?<!\d)\b\d\b(?!d)/
+    word_instances = pull_words(string)
+    number_instances = pull_digits(string)
 
-    word_instances = Regex.scan(word_regex, string) |> Enum.flat_map(&Enum.uniq/1)
-    number_instances = Regex.scan(number_regex, string)
+    word_number_instances = word_instances ++ number_instances
+    word_number_instances |> Enum.map(&IO.puts/1)
 
-    word_number_instances = word_instances <> number_instances
-
-    determine_positions(string, word_number_instances)
+    reorder = rearrange_order(string, word_number_instances)
+    IO.puts(reorder)
   end
 
-  # Determine positions of words and numbers in string, and return first and last
-  def determine_positions(string, instances) do
-    IO.puts(string, instances)
+  def pull_words(string) do
+    regex = ~r/(one|two|three|four|five|six|seven|eight|nine)/
+    Regex.scan(regex, string) |> Enum.flat_map(&Enum.uniq/1)
   end
 
-  @spec extract_and_combine(String.t()) :: integer | nil
-  def extract_and_combine(string) do
-    regex = ~r/\d+/
+  def pull_digits(string) do
+    string
+    |> String.replace(~r/[^0-9]/, "")
+    |> String.split(~r//, trim: true)
+    |> Enum.map(&String.to_integer/1)
+  end
 
-    numbers =
-      Regex.scan(regex, string)
-      |> Enum.map(&String.to_integer(Enum.at(&1, 0, "0")))
-
-    case numbers do
-      [] ->
-        IO.puts("No numbers found in the string.")
-        nil
-
-      [number] ->
-        number
-
-      [first | _rest] ->
-        last = List.last(numbers)
-
-        combined_value =
-          (Integer.to_string(first) <> Integer.to_string(last))
-          |> String.to_integer()
-
-        combined_value
-    end
+  # Rearrange based on where appear in string
+  def rearrange_order(string, instances) do
   end
 end
