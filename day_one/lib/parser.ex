@@ -20,7 +20,7 @@ defmodule Parser do
     word_number_instances = word_instances ++ number_instances
     word_number_instances |> Enum.map(&IO.puts/1)
 
-    reorder = rearrange_order(string, word_number_instances)
+    reorder = find_first_and_last(word_number_instances, string)
     IO.puts(reorder)
   end
 
@@ -37,6 +37,34 @@ defmodule Parser do
   end
 
   # Rearrange based on where appear in string
-  def rearrange_order(string, instances) do
+  def find_first_and_last(list, string) do
+    new = []
+
+    list
+    |> Enum.flat_map(fn item ->
+      {index, _} = :binary.match(string, to_string(item))
+      format = [item, index]
+      new = [format | new]
+    end)
+
+    new |> highest_and_lowest
+  end
+
+  def highest_and_lowest(list) do
+    current_lowest = ["", 999_999]
+    current_highest = ["", -1]
+
+    list
+    |> Enum.map(fn pair ->
+      if Enum.at(pair, 1) < Enum.at(current_lowest, 1) do
+        current_lowest = pair
+      end
+
+      if Enum.at(pair, 1) > Enum.at(current_highest, 1) do
+        current_highest = pair
+      end
+    end)
+
+    [Enum.at(current_lowest, 0), Enum.at(current_highest, 0)]
   end
 end
