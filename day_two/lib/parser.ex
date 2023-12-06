@@ -46,4 +46,30 @@ defmodule Parser do
       [false | acc]
     end
   end
+
+  def get_biggest(line, acc) do
+    [game_id, rest] =
+      String.split(line, ~r/:\s/, parts: 2)
+      |> Enum.map(&String.trim/1)
+
+    game_id =
+      String.split(game_id, ~r/\s/, parts: 2)
+      |> List.last()
+      |> String.to_integer()
+
+    highest_values =
+      rest
+      |> String.split(~r/[;,]/)
+      |> Enum.map(&String.trim/1)
+      |> Enum.reduce(%{}, fn colour_count, acc ->
+        [count_str, colour] = String.split(colour_count, " ")
+        count = String.to_integer(count_str)
+        max_count = Map.get(acc, String.to_atom(colour), 0)
+        new_acc = Map.put(acc, String.to_atom(colour), max(count, max_count))
+        new_acc
+      end)
+      |> Map.values()
+
+    Enum.reduce(highest_values, 1, &(&1 * &2)) + acc
+  end
 end
