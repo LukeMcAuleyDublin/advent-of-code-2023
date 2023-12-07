@@ -1,20 +1,6 @@
 require IEx
 
 defmodule Parser do
-  def input_one do
-    {:ok, text} = File.read(~c"./input_one.txt")
-
-    # remove last as it's an empty string
-    String.split(text, "\n") |> List.delete_at(-1)
-  end
-
-  # First, extract words of numbers, e.g. "five", "four"
-  # Then extrct actual numbers, and the appearance rate
-  # For each of them, determine position in the string, by removing one from appearance rate.
-  # Assign position in string to each number word and number
-  # Grab first and last
-  # Put them together eg 3 and 2 is then 32
-  # return 32 and sum in main
   def read_string(string) do
     word_instances = pull_words(string)
     number_instances = pull_digits(string)
@@ -37,7 +23,6 @@ defmodule Parser do
     |> Enum.map(&String.to_integer/1)
   end
 
-  # Rearrange based on where appear in string
   def find_first_and_last(list, string) do
     new =
       list
