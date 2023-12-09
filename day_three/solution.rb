@@ -46,7 +46,7 @@ input.each_with_index do |line, index|
   end
 end
 
-sum = nums_to_sum.inject(0, :+)
+sum = nums_to_sum.map(&:abs).sum
 
 puts("Sum: #{sum}")
 
